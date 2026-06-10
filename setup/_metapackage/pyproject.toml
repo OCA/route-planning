@@ -1,0 +1,11 @@
+[project]
+name = "odoo-addons-oca-route-planning"
+version = "18.0.20260610.0"
+dependencies = [
+    "odoo-addon-route_planning==18.0.*",
+]
+classifiers=[
+    "Programming Language :: Python",
+    "Framework :: Odoo",
+    "Framework :: Odoo :: 18.0",
+]
