@@ -1,8 +1,9 @@
 [project]
 name = "odoo-addons-oca-route-planning"
-version = "18.0.20260615.0"
+version = "18.0.20260701.0"
 dependencies = [
     "odoo-addon-route_planning==18.0.*",
+    "odoo-addon-route_planning_sale_stock==18.0.*",
     "odoo-addon-route_planning_stock==18.0.*",
 ]
 classifiers=[
