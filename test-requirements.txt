@@ -1,0 +1,1 @@
+odoo-addon-route_planning_rma_delivery @ git+https://github.com/OCA/route-planning.git@refs/pull/12/head#subdirectory=route_planning_rma_delivery
