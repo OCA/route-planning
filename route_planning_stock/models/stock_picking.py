@@ -95,10 +95,15 @@ class StockPicking(models.Model):
     def _can_add_to_route(self):
         """Check if the picking can be added to a route"""
         self.ensure_one()
+        location = (
+            self.location_dest_id
+            if self.picking_type_code == "incoming"
+            else self.location_id
+        )
         return (
             self.route_area_id
             and self.partner_id
-            and self.location_id == self.route_area_id.location_id
+            and location == self.route_area_id.location_id
             and self.state not in ["draft", "done", "cancel"]
         )
 
