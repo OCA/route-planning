@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ================================
 Route Planning Stock Integration
 ================================
@@ -17,7 +13,7 @@ Route Planning Stock Integration
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Froute--planning-lightgray.png?logo=github
@@ -35,6 +31,32 @@ Route Planning Stock Integration
 Integration between Route Planning and Stock to automatically generate
 routes and checkpoints from pickings.
 
+This module automates route and checkpoint creation directly from stock
+pickings and integrates inventory transit locations and stock rules into
+Route Planning workflows.
+
+**Key Features:**
+
+- Automatic generation of a Transit Location per Route Area and
+  corresponding stock rules.
+- Automatic route and checkpoint generation upon picking validation.
+- Automated validation of pickings when route checkpoints are marked as
+  completed.
+
+When you use the transit location created for the Route Area, the
+delivery is performed in two steps:
+
+The first step moves the stock from the internal location where it is
+stored to the transit location. This movement represents the physical
+transfer from your warehouse to the transport vehicle that will perform
+the delivery. A second picking is created when you validate the first
+picking. This picking waits for the corresponding checkpoint to be
+completed when the delivery is completed at the customer. Once the
+checkpoint is completed, the picking is automatically validated.
+
+Note: For better integration and simplicity, we recommend using this
+module with the ``route_planning_delivery`` module installed.
+
 **Table of contents**
 
 .. contents::
@@ -43,19 +65,46 @@ routes and checkpoints from pickings.
 Configuration
 =============
 
+- Go to ``Inventory / Configuration / Settings``.
+- Enable ``Storage Locations`` and save.
+
+Configuring Route Areas
+-----------------------
+
+- Go to ``Route Planning / Configuration / Areas``.
+- Create or edit a Route Area.
+- Set the Warehouse if you have more than one warehouse. Otherwise, the
+  system will use the default warehouse for your company.
+
+Upon saving, the system will automatically:
+
+- Create or update a Transit Location under the warehouse view location.
+- Create or update stock rules linking the warehouse stock location, the
+  route area transit location, and the customer location.
+
+Creating or Editing an Operation Type
+-------------------------------------
+
 - Go to ``Inventory / Configuration / Operation Types``.
-- Select an existing record or create a new one.
-- Enable the ``Route Auto Confirm`` field.
+- Create or edit an operation type.
+- Set the ``Destination Location`` field to the transit location created
+  automatically by the Route Area.
 
 Usage
 =====
 
-- Create a picking using the ``Operation Type`` specific for Route
-- Select a Route Area.
-- Confirm the picking.
-
-The picking will be attached to an existing route with the same area, or
-a new route will be created if none exists.
+- Create a Delivery Order using an operation type whose Destination
+  Location is the transit location created automatically by the Route
+  Area.
+- Assign the Route Area to the picking.
+- Confirm / Validate the picking.
+- The system will automatically search for an existing draft route for
+  that area and scheduled date, or create a new Route.
+- A Route Checkpoint is created and linked to the picking and its
+  partner.
+- Go to the Route and plan it.
+- When the visit to the customer is completed, validate the checkpoint.
+  This will automatically validate the picking.
 
 Bug Tracker
 ===========
