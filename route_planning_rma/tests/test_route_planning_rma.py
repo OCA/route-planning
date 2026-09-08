@@ -200,10 +200,19 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
     @mute_logger("odoo.models.unlink")
     def test_rma_rma_route_area_change(self):
         self.env.company.rma_new_rma_button_from_rma = True
+        carrier_route = self.env.ref(
+            "route_planning_delivery.delivery_carrier_route_demo",
+            raise_if_not_found=False,
+        )
         wizard = self._rma_stock_return_wizard()
         picking_action = wizard.action_create_returns()
         picking_return = self.env["stock.picking"].browse(picking_action["res_id"])
         rma = picking_return.move_ids.rma_receiver_ids
+        # route_planning_rma_delivery compatibility: If the module is installed, you
+        # must set a carrier in order to be able to define a route area later in the
+        # process (so that the field is visible).
+        if carrier_route:
+            rma.reception_carrier_id = carrier_route
         self.assertTrue(rma)
         self.assertEqual(rma.state, "confirmed")
         reception_picking = rma.reception_move_id.picking_id
