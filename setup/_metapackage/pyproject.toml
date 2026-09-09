@@ -1,10 +1,11 @@
 [project]
 name = "odoo-addons-oca-route-planning"
-version = "18.0.20260907.0"
+version = "18.0.20260909.0"
 dependencies = [
     "odoo-addon-route_planning==18.0.*",
     "odoo-addon-route_planning_delivery==18.0.*",
     "odoo-addon-route_planning_rma==18.0.*",
+    "odoo-addon-route_planning_rma_sale==18.0.*",
     "odoo-addon-route_planning_sale_stock==18.0.*",
     "odoo-addon-route_planning_stock==18.0.*",
 ]
