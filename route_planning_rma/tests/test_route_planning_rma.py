@@ -54,6 +54,9 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         rma.reception_move_id.quantity = rma.product_uom_qty
         reception_picking = rma.reception_move_id.picking_id
         self.assertEqual(
+            reception_picking.picking_type_id, self.warehouse.rma_in_type_id
+        )
+        self.assertEqual(
             reception_picking.location_dest_id, self.area_north.location_id
         )
         self.assertEqual(
@@ -65,6 +68,9 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         reception_picking.button_validate()
         next_reception_picking = reception_picking._get_next_transfers()
         self.assertTrue(next_reception_picking)
+        self.assertEqual(
+            next_reception_picking.picking_type_id, self.warehouse.rma_in_type_id
+        )
         self.assertEqual(next_reception_picking.route_area_id, self.area_north)
         self.assertEqual(
             next_reception_picking.location_id, self.area_north.location_id
@@ -83,6 +89,7 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         wizard.action_deliver()
         self.assertTrue(rma.delivery_move_ids.picking_id)
         rma_picking = rma.delivery_move_ids.picking_id
+        self.assertEqual(rma_picking.picking_type_id, self.warehouse.rma_out_type_id)
         self.assertEqual(rma_picking.route_area_id, self.area_south)
         self.assertEqual(rma_picking.location_dest_id, self.area_south.location_id)
         # Change route area
@@ -94,6 +101,9 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         self.assertEqual(rma_picking.state, "done")
         next_rma_picking = rma_picking._get_next_transfers()
         self.assertTrue(next_rma_picking)
+        self.assertEqual(
+            next_rma_picking.picking_type_id, self.warehouse.rma_out_type_id
+        )
         self.assertEqual(next_rma_picking.route_area_id, self.area_north)
         self.assertEqual(next_rma_picking.location_id, self.area_north.location_id)
         checkpoint = next_rma_picking.route_checkpoint_ids
