@@ -10,7 +10,9 @@
                 >carrier_delivery_type=='route_planning'</attribute>
                 <attribute
                     name="invisible"
-                >carrier_delivery_type != 'route_planning'</attribute>
+                    add="carrier_delivery_type != 'route_planning'"
+                    separator=" or "
+                />
             </field>
             <field name="reception_route_area_id" position="attributes">
                 <attribute
@@ -18,7 +20,9 @@
                 >reception_carrier_delivery_type=='route_planning'</attribute>
                 <attribute
                     name="invisible"
-                >reception_carrier_delivery_type != 'route_planning'</attribute>
+                    add="reception_carrier_delivery_type != 'route_planning'"
+                    separator=" or "
+                />
             </field>
         </field>
     </record>

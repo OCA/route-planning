@@ -7,7 +7,7 @@
             <field name="rma_operation_id" position="after">
                 <field
                     name="reception_route_area_id"
-                    invisible="not create_rma"
+                    invisible="not create_rma or not can_use_route_area"
                     groups="route_planning.group_route_planning_user"
                 />
             </field>

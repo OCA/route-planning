@@ -8,7 +8,9 @@
                 <attribute name="required">delivery_type=='route_planning'</attribute>
                 <attribute
                     name="invisible"
-                >delivery_type != 'route_planning'</attribute>
+                    add="delivery_type != 'route_planning'"
+                    separator=" or "
+                />
             </field>
         </field>
     </record>

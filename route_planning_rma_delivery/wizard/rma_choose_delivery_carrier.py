@@ -7,6 +7,10 @@ from odoo import api, fields, models
 class RmaChooseDeliveryCarrier(models.TransientModel):
     _inherit = "rma.choose.delivery.carrier"
 
+    operation_id = fields.Many2one(related="rma_id.operation_id")
+    can_use_route_area = fields.Boolean(
+        compute="_compute_can_use_route_area",
+    )
     delivery_type = fields.Selection(related="carrier_id.delivery_type")
     route_area_id = fields.Many2one(
         comodel_name="route.area",
@@ -15,6 +19,13 @@ class RmaChooseDeliveryCarrier(models.TransientModel):
         store=True,
         readonly=False,
     )
+
+    @api.depends("operation_id")
+    def _compute_can_use_route_area(self):
+        for item in self:
+            item.can_use_route_area = (
+                item.operation_id._can_use_route_area() if item.operation_id else False
+            )
 
     @api.depends("carrier_id")
     def _compute_route_area_id(self):

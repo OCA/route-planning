@@ -203,7 +203,6 @@ class TestRoutePlanningRmaDelivery(TestRoutePlanningRmaCommon):
             }
         )
         self.assertEqual(rma.reception_carrier_id, self.carrier)
-        # self.assertFalse(rma.reception_route_area_id)
         rma.write(
             {"carrier_id": self.carrier_route.id, "route_area_id": self.area_north.id}
         )
@@ -213,6 +212,7 @@ class TestRoutePlanningRmaDelivery(TestRoutePlanningRmaCommon):
     def test_rma_onchange_recception_route_area(self):
         self.company.rma_reception_strategy = "rma_method"
         rma_form = Form(self.env["rma"])
+        rma_form.operation_id = self.operation
         rma_form.reception_carrier_id = self.carrier_route
         rma_form.reception_route_area_id = self.area_north
         rma_form.reception_carrier_id = self.carrier

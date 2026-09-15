@@ -10,7 +10,9 @@
             <field name="reception_route_area_id" position="attributes">
                 <attribute
                     name="invisible"
-                >not create_rma or reception_carrier_delivery_type != 'route_planning'</attribute>
+                    add="reception_carrier_delivery_type != 'route_planning'"
+                    separator=" or "
+                />
                 <attribute
                     name="required"
                 >reception_carrier_delivery_type=='route_planning'</attribute>

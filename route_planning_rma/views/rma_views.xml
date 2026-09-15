@@ -8,12 +8,14 @@
                 <field
                     name="route_area_id"
                     readonly="state not in ('draft', 'confirmed', 'received')"
+                    invisible="not can_use_route_area"
                     options="{'no_create': True, 'no_open': True}"
                     groups="route_planning.group_route_planning_user"
                 />
                 <field
                     name="reception_route_area_id"
                     readonly="state != 'draft'"
+                    invisible="not can_use_route_area"
                     options="{'no_create': True, 'no_open': True}"
                     groups="route_planning.group_route_planning_user"
                 />

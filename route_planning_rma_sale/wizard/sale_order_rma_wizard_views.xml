@@ -6,6 +6,7 @@
             <field name="operation_id" position="after">
                 <field
                     name="reception_route_area_id"
+                    invisible="not can_use_route_area"
                     options="{'no_create': True, 'no_open': True}"
                     groups="route_planning.group_route_planning_user"
                 />

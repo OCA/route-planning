@@ -1,6 +1,7 @@
 # Copyright 2025-2026 Tecnativa - Víctor Martínez
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from odoo.exceptions import UserError
 from odoo.tests import Form
 from odoo.tools import mute_logger
 
@@ -275,3 +276,39 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         )
         self.assertFalse(in_checkpoint_0.exists())
         self.assertTrue(reception_picking_extra.has_route_planning)
+
+    @mute_logger("odoo.models.unlink")
+    def test_rma_reception_operation_change(self):
+        carrier_route = self.env.ref(
+            "route_planning_delivery.delivery_carrier_route_demo",
+            raise_if_not_found=False,
+        )
+        wizard = self._rma_stock_return_wizard()
+        if carrier_route:
+            wizard.reception_carrier_id = carrier_route
+        wizard.reception_route_area_id = self.area_north
+        picking_action = wizard.action_create_returns()
+        picking_return = self.env["stock.picking"].browse(picking_action["res_id"])
+        rma = picking_return.move_ids.rma_receiver_ids
+        self.assertTrue(rma)
+        self.assertEqual(rma.state, "confirmed")
+        reception_picking = rma.reception_move_id.picking_id
+        self.assertEqual(reception_picking.route_area_id, self.area_north)
+        self.assertTrue(reception_picking.has_route_planning)
+        checkpoint = reception_picking.route_checkpoint_ids
+        # Change operation to refund
+        refund_operation = self.env.ref("rma.rma_operation_refund")
+        rma.operation_id = refund_operation
+        self.assertFalse(checkpoint.exists())
+        # Change operation to replace again
+        rma.operation_id = self.operation
+        self.assertTrue(reception_picking.route_checkpoint_ids)
+        checkpoint = reception_picking.route_checkpoint_ids
+        checkpoint.route_id.action_planned()
+        self.assertEqual(checkpoint.state, "planned")
+        # Change operation to refund (again)
+        with self.assertRaisesRegex(
+            UserError,
+            "You cannot delete checkpoints that are not in draft state",
+        ):
+            rma.operation_id = refund_operation

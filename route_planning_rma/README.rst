@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ==============================
 Route Planning RMA Integration
 ==============================
@@ -17,7 +13,7 @@ Route Planning RMA Integration
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Froute--planning-lightgray.png?logo=github
@@ -40,6 +36,9 @@ picking if an RMA is to be created.
 
 The reception route area is added to the wizard for creating an RMA from
 another RMA.
+
+If the rma operation is a refund, a checkpoint will not be created for
+the receipt (you will not be able to select a route area).
 
 **Table of contents**
 
@@ -67,9 +66,9 @@ Authors
 Contributors
 ------------
 
-- Pedro M. Baeza
-- Víctor Martínez
-- Carlos Lopez
+-  Pedro M. Baeza
+-  Víctor Martínez
+-  Carlos Lopez
 
 Maintainers
 -----------

@@ -7,10 +7,20 @@ from odoo import api, fields, models
 class RmaRmaWizard(models.TransientModel):
     _inherit = "rma.rma.wizard"
 
+    can_use_route_area = fields.Boolean(
+        compute="_compute_can_use_route_area",
+    )
     reception_route_area_id = fields.Many2one(
         comodel_name="route.area",
         string="Reception route area",
     )
+
+    @api.depends("operation_id")
+    def _compute_can_use_route_area(self):
+        for item in self:
+            item.can_use_route_area = (
+                item.operation_id._can_use_route_area() if item.operation_id else False
+            )
 
     @api.model
     def default_get(self, fields_list):

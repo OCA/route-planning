@@ -7,6 +7,9 @@ from odoo import api, fields, models
 class Rma(models.Model):
     _inherit = "rma"
 
+    can_use_route_area = fields.Boolean(
+        compute="_compute_can_use_route_area",
+    )
     reception_route_area_id = fields.Many2one(
         comodel_name="route.area",
         string="Reception route area",
@@ -20,6 +23,7 @@ class Rma(models.Model):
         store=True,
         readonly=False,
     )
+    operation_id = fields.Many2one(inverse="_inverse_operation_id")
 
     def _compute_warehouse_id(self):
         """Support for non-RMA locations."""
@@ -27,6 +31,13 @@ class Rma(models.Model):
         for record in self.filtered(lambda x: x.location_id and not x.warehouse_id):
             record.warehouse_id = record.location_id.warehouse_id
         return res
+
+    @api.depends("operation_id")
+    def _compute_can_use_route_area(self):
+        for rma in self:
+            rma.can_use_route_area = (
+                rma.operation_id._can_use_route_area() if rma.operation_id else False
+            )
 
     @api.depends("partner_shipping_id", "company_id")
     def _compute_route_area_id(self):
@@ -47,6 +58,18 @@ class Rma(models.Model):
             item.delivery_move_ids.picking_id.filtered(
                 lambda p: p.state not in ("done", "cancel")
             ).write({"route_area_id": item.route_area_id.id})
+
+    def _inverse_operation_id(self):
+        for item in self.filtered(
+            lambda x: x.operation_id
+            and x.reception_route_area_id
+            and x.reception_move_id
+        ):
+            picking = item.reception_move_id.picking_id
+            if picking._can_add_to_route():
+                picking._find_auto_route()
+            else:
+                picking.route_checkpoint_ids.unlink()
 
     @api.onchange("reception_route_area_id")
     def onchange_reception_route_area_id(self):

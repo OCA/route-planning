@@ -10,7 +10,7 @@
             <field name="carrier_id" position="after">
                 <field
                     name="route_area_id"
-                    invisible="delivery_type != 'route_planning'"
+                    invisible="not can_use_route_area or delivery_type != 'route_planning'"
                     required="delivery_type == 'route_planning'"
                     groups="route_planning.group_route_planning_user"
                 />

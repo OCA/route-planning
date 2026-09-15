@@ -16,6 +16,18 @@ class SaleOrderRmaWizard(models.TransientModel):
         readonly=False,
     )
 
+    @api.depends("can_use_route_area")
+    def _compute_available_reception_carrier_ids(self):
+        # If the selected operation does not allow route_area, we remove the carriers
+        # of type route_planning
+        res = super()._compute_available_reception_carrier_ids()
+        for item in self.filtered(lambda x: not x.can_use_route_area):
+            carriers = item.available_reception_carrier_ids.filtered(
+                lambda x: x.delivery_type != "route_planning"
+            )
+            item.available_reception_carrier_ids = carriers
+        return res
+
     @api.depends("reception_carrier_id")
     def _compute_reception_route_area_id(self):
         for item in self:
