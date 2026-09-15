@@ -170,3 +170,50 @@ class TestRoutePlanningRmaDelivery(TestRoutePlanningRmaCommon):
         rma_picking.button_validate()
         self.assertEqual(rma_picking.state, "done")
         self.assertEqual(rma.state, "returned")
+
+    def test_rma_onchange_route_area(self):
+        self.company.rma_delivery_strategy = "rma_method"
+        wizard = self._rma_stock_return_wizard()
+        picking_action = wizard.action_create_returns()
+        picking_return = self.env["stock.picking"].browse(picking_action["res_id"])
+        rma = picking_return.move_ids.rma_receiver_ids
+        self.assertTrue(rma)
+        self.assertEqual(rma.state, "confirmed")
+        reception_picking = rma.reception_move_id.picking_id
+        reception_picking.button_validate()
+        self.assertEqual(reception_picking.state, "done")
+        self.assertEqual(rma.state, "received")
+        rma_form = Form(rma)
+        rma_form.carrier_id = self.carrier_route
+        rma_form.route_area_id = self.area_north
+        rma_form.carrier_id = self.carrier
+        self.assertFalse(rma_form.route_area_id)
+
+    def test_rma_write_validations(self):
+        self.company.rma_reception_strategy = "rma_method"
+        self.company.rma_delivery_strategy = "rma_method"
+        wizard = self._rma_stock_return_wizard()
+        picking_action = wizard.action_create_returns()
+        picking_return = self.env["stock.picking"].browse(picking_action["res_id"])
+        rma = picking_return.move_ids.rma_receiver_ids
+        rma.write(
+            {
+                "reception_carrier_id": self.carrier.id,
+                "reception_route_area_id": self.area_north.id,
+            }
+        )
+        self.assertEqual(rma.reception_carrier_id, self.carrier)
+        # self.assertFalse(rma.reception_route_area_id)
+        rma.write(
+            {"carrier_id": self.carrier_route.id, "route_area_id": self.area_north.id}
+        )
+        self.assertEqual(rma.carrier_id, self.carrier_route)
+        self.assertEqual(rma.route_area_id, self.area_north)
+
+    def test_rma_onchange_recception_route_area(self):
+        self.company.rma_reception_strategy = "rma_method"
+        rma_form = Form(self.env["rma"])
+        rma_form.reception_carrier_id = self.carrier_route
+        rma_form.reception_route_area_id = self.area_north
+        rma_form.reception_carrier_id = self.carrier
+        self.assertFalse(rma_form.reception_route_area_id)

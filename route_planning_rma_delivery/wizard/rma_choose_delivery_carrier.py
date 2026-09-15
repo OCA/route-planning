@@ -11,7 +11,18 @@ class RmaChooseDeliveryCarrier(models.TransientModel):
     route_area_id = fields.Many2one(
         comodel_name="route.area",
         string="Route area",
+        compute="_compute_route_area_id",
+        store=True,
+        readonly=False,
     )
+
+    @api.depends("carrier_id")
+    def _compute_route_area_id(self):
+        for item in self:
+            if item.delivery_type != "route_planning":
+                # Set route_area_id empty so that the data is consistent
+                # with carrier_id
+                item.route_area_id = False
 
     @api.model
     def default_get(self, fields_list):
@@ -27,12 +38,6 @@ class RmaChooseDeliveryCarrier(models.TransientModel):
             )
             res.update(route_area_id=route_area.id)
         return res
-
-    @api.onchange("carrier_id")
-    def onchange_carrier_id(self):
-        for item in self:
-            if item.delivery_type != "route_planning":
-                item.route_area_id = False
 
     def _prepare_rma_vals(self):
         vals = super()._prepare_rma_vals()
