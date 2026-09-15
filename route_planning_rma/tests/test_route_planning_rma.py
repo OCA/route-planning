@@ -44,6 +44,13 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
 
     def test_rma_with_route_area(self):
         wizard = self._rma_stock_return_wizard()
+        carrier_route = self.env.ref(
+            "route_planning_delivery.delivery_carrier_route_demo",
+            raise_if_not_found=False,
+        )
+        if carrier_route and "reception_carrier_id" in wizard._fields:
+            # rma_delivery compatibility
+            wizard.reception_carrier_id = carrier_route
         wizard.reception_route_area_id = self.area_north
         picking_action = wizard.action_create_returns()
         picking_return = self.env["stock.picking"].browse(picking_action["res_id"])
@@ -82,6 +89,8 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         self.assertEqual(next_reception_picking.state, "done")
         self.assertEqual(rma.state, "received")
         # Create return
+        if carrier_route and "carrier_id" in rma._fields:
+            rma.carrier_id = carrier_route  # rma_delivery compatibility
         rma.route_area_id = self.area_south
         res = rma.action_return()
         wizard_form = Form(self.env[res["res_model"]].with_context(**res["context"]))
@@ -221,7 +230,7 @@ class TestRoutePlanningRma(TestRoutePlanningRmaCommon):
         # route_planning_rma_delivery compatibility: If the module is installed, you
         # must set a carrier in order to be able to define a route area later in the
         # process (so that the field is visible).
-        if carrier_route:
+        if carrier_route and "carrier_id" in rma._fields:
             rma.reception_carrier_id = carrier_route
         self.assertTrue(rma)
         self.assertEqual(rma.state, "confirmed")
