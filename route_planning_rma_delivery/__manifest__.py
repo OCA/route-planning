@@ -9,12 +9,13 @@
     "website": "https://github.com/OCA/route-planning",
     "depends": [
         "route_planning_delivery",
-        "route_planning_rma",
-        "rma_delivery",
+        "route_planning_rma_sale",
+        "rma_sale_delivery",
     ],
     "data": [
         "views/rma_views.xml",
         "wizard/rma_choose_delivery_carrier_views.xml",
+        "wizard/sale_order_rma_wizard_views.xml",
         "wizard/stock_picking_return_views.xml",
         "wizard/rma_rma_wizard_views.xml",
     ],
