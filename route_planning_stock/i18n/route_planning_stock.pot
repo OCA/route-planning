@@ -91,6 +91,11 @@ msgid "Quantity"
 msgstr ""
 
 #. module: route_planning_stock
+#: model:ir.model,name:route_planning_stock.model_route_route
+msgid "Route"
+msgstr ""
+
+#. module: route_planning_stock
 #: model:ir.model,name:route_planning_stock.model_route_area
 #: model:ir.model.fields,field_description:route_planning_stock.field_stock_picking__route_area_id
 msgid "Route Area"
