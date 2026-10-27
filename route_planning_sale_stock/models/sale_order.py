@@ -29,9 +29,9 @@ class SaleOrder(models.Model):
         we will update the route_area_id for pending pickings and moves
         """
         for item in self.filtered("picking_ids"):
-            item.picking_ids.filtered(
-                lambda p: p.state not in ("done", "cancel")
-            ).write({"route_area_id": item.route_area_id.id})
+            item.picking_ids.filtered(lambda p: p.state != "cancel").write(
+                {"route_area_id": item.route_area_id.id}
+            )
 
 
 class SaleOrderLine(models.Model):
