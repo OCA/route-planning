@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import Command
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import Form
 from odoo.tools import mute_logger
 
@@ -174,3 +174,33 @@ class TestRoutePlanningDelivery(RouteCommon):
         self.assertEqual(picking.route_area_id, self.area_north)
         self.assertEqual(move_a.location_dest_id, self.area_north.location_id)
         self.assertEqual(picking.location_dest_id, self.area_north.location_id)
+
+    @mute_logger("odoo.models.unlink")
+    def test_sale_order_confirm_invoice_choose_delivery_carrier(self):
+        self._add_shipping_to_order(
+            self.order, self.carrier_route, route_area=self.area_north
+        )
+        self.assertEqual(self.order.carrier_id, self.carrier_route)
+        self.assertEqual(self.order.route_area_id, self.area_north)
+        self.order.action_confirm()
+        picking = self.order.picking_ids
+        self.assertEqual(picking.carrier_id, self.carrier_route)
+        self.assertEqual(picking.route_area_id, self.area_north)
+        invoice = self.order._create_invoices()
+        invoice.action_post()
+        self.assertEqual(invoice.state, "posted")
+        self._add_shipping_to_order(
+            self.order, self.carrier_route, route_area=self.area_south
+        )
+        self.assertEqual(self.order.carrier_id, self.carrier_route)
+        self.assertEqual(self.order.route_area_id, self.area_south)
+        self.assertEqual(picking.carrier_id, self.carrier_route)
+        self.assertEqual(picking.route_area_id, self.area_south)
+        self.order.order_line.filtered("is_delivery").price_unit = 1
+        with self.assertRaisesRegex(
+            UserError,
+            "You can not update the shipping costs on an order where it was already invoiced!",  # noqa: E501
+        ):
+            self._add_shipping_to_order(
+                self.order, self.carrier_route, route_area=self.area_south
+            )
