@@ -39,13 +39,13 @@ class Rma(models.Model):
         for item in self.filtered(lambda x: x.reception_move_id):
             item.onchange_reception_route_area_id()
             item.reception_move_id.picking_id.filtered(
-                lambda p: p.state not in ("done", "cancel")
+                lambda p: p.state != "cancel"
             ).write({"route_area_id": item.reception_route_area_id.id})
 
     def _inverse_route_area_id(self):
         for item in self.filtered(lambda x: x.delivery_move_ids):
             item.delivery_move_ids.picking_id.filtered(
-                lambda p: p.state not in ("done", "cancel")
+                lambda p: p.state != "cancel"
             ).write({"route_area_id": item.route_area_id.id})
 
     @api.onchange("reception_route_area_id")
