@@ -13,6 +13,7 @@
         "security/ir.model.access.csv",
         "views/route_area_views.xml",
         "views/route_checkpoint_views.xml",
+        "views/route_incident_type_views.xml",
         "views/route_route_views.xml",
         "views/stock_picking_views.xml",
     ],
