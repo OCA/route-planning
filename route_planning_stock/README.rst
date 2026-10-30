@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ================================
 Route Planning Stock Integration
 ================================
@@ -17,7 +13,7 @@ Route Planning Stock Integration
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Froute--planning-lightgray.png?logo=github
@@ -93,6 +89,13 @@ Creating or Editing an Operation Type
 - Create or edit an operation type.
 - Set the ``Destination Location`` field to the transit location created
   automatically by the Route Area.
+
+Configuring Incident Types
+--------------------------
+
+- Go to ``Route Planning / Configuration / Incident Types``.
+- Check ``Cancel Picking`` on the incident types that must cancel the
+  picking linked to the checkpoint when the incident is created.
 
 Usage
 =====
