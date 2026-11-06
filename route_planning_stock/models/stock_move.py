@@ -37,41 +37,42 @@ class StockMove(models.Model):
         """
         return
 
-    def _get_rule_from_record_route_area(self, location_src_id, location_dest_id):
-        rule = self.rule_id
-        return rule.route_id.rule_ids.filtered(
-            lambda r: r.location_src_id == location_src_id
-            and r.location_dest_id == location_dest_id
-            and r.procure_method == rule.procure_method
-        )
-
-    def _get_stock_move_vals_from_record_route_area(self, location_final):
+    def _get_stock_move_vals_from_record_route_area(self, location):
         """This method will be extended by other modules to apply the appropriate
         changes of the linked picking moves.
         """
         self.ensure_one()
-        vals = {}
-        if not location_final:
-            return vals
         rule = self.rule_id
-        if self.location_final_id:
-            rules = self._get_rule_from_record_route_area(
-                rule.location_src_id, location_final
+        vals = {}
+        if not location or not rule:
+            return vals
+        procurement_group = self.env["procurement.group"]
+        rule_values = {
+            "route_ids": self.route_ids,
+            "product_packaging_id": self.product_packaging_id,
+            "warehouse_id": (
+                self.warehouse_id or self.picking_id.picking_type_id.warehouse_id
+            ),
+        }
+        if rule.action == "push":
+            new_rule = procurement_group._get_push_rule(
+                self.product_id, location, rule_values
             )
-            rules = rules.filtered(lambda x: x.action != "push")
         else:
-            rules = self._get_rule_from_record_route_area(
-                location_final, rule.location_dest_id
+            new_rule = procurement_group._get_rule(
+                self.product_id, location, rule_values
             )
-        new_rule = rules[:1]
-        if new_rule:
-            vals["rule_id"] = new_rule.id
-            vals["location_id"] = new_rule.location_src_id.id
-            if new_rule.location_dest_from_rule or not self._get_route_area():
-                # Although the _compute_location_dest_id() method in stock.move uses
-                # this data, it does not have the appropriate "depends" field, and
-                # we do not want to add it; therefore, we must change it manually
-                vals["location_dest_id"] = new_rule.location_dest_id.id
-            if self.location_final_id:
-                vals["location_final_id"] = location_final.id
+        if not new_rule:
+            return vals
+        vals["rule_id"] = new_rule.id
+        vals["location_id"] = new_rule.location_src_id.id
+        if rule.action == "push":
+            location_dest = new_rule.location_dest_id
+            if self.location_final_id and self.location_final_id._child_of(
+                location_dest
+            ):
+                location_dest = self.location_final_id
+            vals["location_dest_id"] = location_dest.id
+        elif new_rule.location_dest_from_rule or not self._get_route_area():
+            vals["location_dest_id"] = new_rule.location_dest_id.id
         return vals
