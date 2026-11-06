@@ -45,3 +45,8 @@ class SaleOrderLine(models.Model):
         location = super()._get_location_final()
         ra_location = self._get_route_area_location()
         return ra_location or location
+
+    def _get_outgoing_incoming_moves(self, strict=True):
+        # More information _is_outgoing() (stock.location). route_planning_stock
+        self = self.with_context(route_planning_force_outgoing=True)
+        return super()._get_outgoing_incoming_moves(strict=strict)
