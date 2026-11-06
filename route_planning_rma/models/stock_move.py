@@ -30,7 +30,10 @@ class StockMove(models.Model):
         res = super()._set_locations_from_record_route_area()
         for item in self.filtered(lambda x: x.rma_id or x.rma_receiver_ids):
             if item.rma_id:
-                custom_location = item.rma_id._get_location_final()
+                custom_location = (
+                    item.rma_id._get_route_area_location()
+                    or item.rma_id._get_location_final()
+                )
             else:
                 custom_location = fields.first(item.rma_receiver_ids).location_id
             vals = item._get_stock_move_vals_from_record_route_area(custom_location)
