@@ -41,7 +41,11 @@ class SaleOrderLine(models.Model):
         self.ensure_one()
         return self.order_id.route_area_id.location_id
 
-    def _get_location_final(self):
-        location = super()._get_location_final()
-        ra_location = self._get_route_area_location()
-        return ra_location or location
+    def _prepare_procurement_values(self, group_id=False):
+        values = super()._prepare_procurement_values(group_id=group_id)
+        values.update(
+            {
+                "route_area_location_id": self._get_route_area_location(),
+            }
+        )
+        return values
