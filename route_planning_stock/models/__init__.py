@@ -1,3 +1,4 @@
+from . import procurement_group
 from . import route_area
 from . import route_checkpoint
 from . import route_incident_type

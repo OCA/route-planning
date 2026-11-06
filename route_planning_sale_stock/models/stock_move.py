@@ -16,5 +16,8 @@ class StockMove(models.Model):
         # We define the appropriate destination location associated with the sol
         res = super()._set_locations_from_record_route_area()
         for item in self.filtered(lambda x: x.sale_line_id):
-            item.location_dest_id = item.sale_line_id._get_location_final()
+            sale_line = item.sale_line_id
+            item.location_dest_id = (
+                sale_line._get_route_area_location() or sale_line._get_location_final()
+            )
         return res

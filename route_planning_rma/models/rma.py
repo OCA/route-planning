@@ -60,7 +60,26 @@ class Rma(models.Model):
         self.ensure_one()
         return self.route_area_id
 
-    def _get_location_final(self):
-        location = super()._get_location_final()
-        route_area = self._get_route_area()
-        return route_area.location_id or location
+    def _get_route_area_location(self):
+        self.ensure_one()
+        return self._get_route_area().location_id
+
+    def _prepare_replace_procurement_vals(self, warehouse, scheduled_date):
+        vals = super()._prepare_replace_procurement_vals(
+            warehouse=warehouse, scheduled_date=scheduled_date
+        )
+        vals.update(
+            {
+                "route_area_location_id": self._get_route_area_location(),
+            }
+        )
+        return vals
+
+    def _prepare_delivery_procurement_vals(self, scheduled_date):
+        vals = super()._prepare_delivery_procurement_vals(scheduled_date)
+        vals.update(
+            {
+                "route_area_location_id": self._get_route_area_location(),
+            }
+        )
+        return vals
