@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo.tests import Form
+from odoo.tools import mute_logger
 
 from odoo.addons.route_planning.tests.common import RouteCommon
 
@@ -93,3 +94,43 @@ class TestRoutePlanningSaleStock(RouteCommon):
         self.assertEqual(move.location_dest_id, self.area_north.location_id)
         self.assertEqual(picking.location_id, self.warehouse.lot_stock_id)
         self.assertEqual(picking.location_dest_id, self.area_north.location_id)
+
+    @mute_logger("odoo.models.unlink")
+    def test_sale_order_confirm_cancel_confirm(self):
+        self.order.route_area_id = self.area_north
+        self.order.action_confirm()
+        self.assertEqual(self.order.state, "sale")
+        out_picking = self.order.picking_ids
+        out_picking.button_validate()
+        self.assertEqual(out_picking.state, "done")
+        return_wizard = (
+            self.env["stock.return.picking"]
+            .with_context(
+                active_id=out_picking.id,
+                active_model=out_picking._name,
+            )
+            .create({})
+        )
+        res = return_wizard.action_create_returns_all()
+        out_picking_return = self.env[res["res_model"]].browse(res["res_id"])
+        out_picking_return.button_validate()
+        self.assertEqual(out_picking_return.state, "done")
+        out_picking_extra = out_picking._get_next_transfers()
+        out_picking_extra.action_cancel()
+        self.assertEqual(out_picking_extra.state, "cancel")
+        self.assertEqual(out_picking_extra.route_checkpoint_ids.state, "incident")
+        self.assertEqual(out_picking_extra.route_checkpoint_ids.route_id.state, "done")
+        res = self.order.action_cancel()
+        cancel_wizard = (
+            self.env[res["res_model"]].with_context(**res["context"]).create({})
+        )
+        cancel_wizard.action_cancel()
+        self.assertEqual(self.order.state, "cancel")
+        self.order.action_draft()
+        self.assertEqual(self.order.state, "draft")
+        line_a = self.order.order_line
+        moves = line_a.move_ids
+        self.order.action_confirm()
+        self.assertEqual(self.order.state, "sale")
+        new_move = line_a.move_ids - moves
+        self.assertEqual(new_move.product_uom_qty, 1)

@@ -16,9 +16,11 @@ class StockMove(models.Model):
         # We define the appropriate data associated with the sol
         res = super()._set_locations_from_record_route_area()
         for item in self.filtered(lambda x: x.sale_line_id):
-            vals = item._get_stock_move_vals_from_record_route_area(
-                item.sale_line_id._get_location_final()
+            sale_line = item.sale_line_id
+            location_final = (
+                sale_line._get_route_area_location() or sale_line._get_location_final()
             )
+            vals = item._get_stock_move_vals_from_record_route_area(location_final)
             if vals:
                 item.write(vals)
         return res
