@@ -77,6 +77,11 @@ msgid ""
 msgstr ""
 
 #. module: route_planning_stock
+#: model:ir.model,name:route_planning_stock.model_stock_location
+msgid "Inventory Locations"
+msgstr ""
+
+#. module: route_planning_stock
 #: model:ir.model.fields,field_description:route_planning_stock.field_route_area__location_id
 msgid "Location"
 msgstr "Ubicación"
@@ -102,6 +107,11 @@ msgid "Picking Domain"
 msgstr ""
 
 #. module: route_planning_stock
+#: model:ir.model,name:route_planning_stock.model_procurement_group
+msgid "Procurement Group"
+msgstr ""
+
+#. module: route_planning_stock
 #: model_terms:ir.ui.view,arch_db:route_planning_stock.view_route_checkpoint_form
 msgid "Quantity"
 msgstr "Cantidad"
@@ -116,6 +126,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:route_planning_stock.field_stock_picking__route_area_id
 msgid "Route Area"
 msgstr "Área de ruta"
+
+#. module: route_planning_stock
+#: model:ir.model.fields,field_description:route_planning_stock.field_stock_location__route_area_ids
+msgid "Route Areas"
+msgstr ""
 
 #. module: route_planning_stock
 #: model:ir.model,name:route_planning_stock.model_route_checkpoint
